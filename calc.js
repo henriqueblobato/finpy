@@ -1,71 +1,57 @@
+const MAX_LIST_ITEMS = 7;
+const REAL_TIME_INTERVAL_MS = 1000;
 
+const volume = document.getElementById("volume");
+const initialValue = document.getElementById("initial-value");
+const alavancagem = document.getElementById("alavancagem");
+const valuesTable = document.getElementById("values-table");
+const dataTable = document.getElementById("data-table");
+const horizontalList = document.getElementById("horizontal-list");
+const realTimeCheck = document.getElementById("real-time-check");
+const table = document.getElementById("custom-table");
 let intervalId;
 
 function addToTable() {
-  var volume = document.getElementById("volume").value;
-  var initialValue = document.getElementById("initial-value").value;
-  var alavancagem = document.getElementById("alavancagem").value;
-
-  var profit = (volume * initialValue * alavancagem);
-
-  var table = document.getElementById("myTable");
+  var v = volume.value;
+  var iv = initialValue.value;
+  var al = alavancagem.value;
+  var lucro = (v * iv * al).toFixed(2);
 
   var newRow = table.insertRow(-1);
-
   newRow.insertCell(0).innerHTML = new Date().toLocaleString();
-  newRow.insertCell(1).innerHTML = volume;
-  newRow.insertCell(2).innerHTML = initialValue;
-  newRow.insertCell(3).innerHTML = alavancagem;
-//  newRow.insertCell(4).innerHTML = profit.toFixed(2);
-//  newRow.insertCell(5).innerHTML = profit.toFixed(2) * 5;
-//  newRow.insertCell(5).innerHTML = profit.toFixed(2) * alavancagem * volume;
-
+  newRow.insertCell(1).innerHTML = volume.value;
+  newRow.insertCell(2).innerHTML = initialValue.value;
+  newRow.insertCell(3).innerHTML = alavancagem.value;
+  newRow.insertCell(4).innerHTML = "."
+  newRow.insertCell(5).innerHTML = "."
+  newRow.insertCell(6).innerHTML = "."
 }
 
 function addDataToTable(data) {
   colorizeMinMax();
-  const table = document.getElementById("values-table");
 
-  // Insert a new row at the end of the table
-  const newRow = table.insertRow(-1);
+  const newRow = valuesTable.insertRow(-1);
 
-  // Insert cells into the new row
   const dateCell = newRow.insertCell(0);
   const volumeCell = newRow.insertCell(1);
   const priceCell = newRow.insertCell(2);
   const leverageCell = newRow.insertCell(3);
   const spreadCell = newRow.insertCell(4);
   const costCell = newRow.insertCell(5);
-  const profitCell = newRow.insertCell(6);
+  const saldoCell = newRow.insertCell(6);
 
-  // Fill the cells with data
   dateCell.textContent = new Date().toLocaleString();
   volumeCell.textContent = data.volume;
   priceCell.textContent = data.initialValue;
   leverageCell.textContent = data.alavancagem;
   spreadCell.textContent = data.spread;
   costCell.textContent = data.custoOperacao;
-  profitCell.textContent = data.lucro;
+  saldoCell.textContent = data.saldoNecessario;
+  console.log(data);
 
-  // Remove the first row if the table has more than 10 rows
-  if (table.rows.length > 10) {
-    table.deleteRow(1);
+  if (valuesTable.rows.length > 10) {
+    valuesTable.deleteRow(1);
   }
-  colorizeMinMax();
-}
-
-
-function addListItem(item) {
-  colorizeMinMax();
-  const table = document.getElementById("data-table");
-
-  if (table.rows.length >= MAX_LIST_ITEMS) {
-    table.deleteRow(-1);
-  }
-
-  addTableRow(table, item);
-
-  console.log("added item", item, "to table", table);
   colorizeMinMax();
 }
 
@@ -92,7 +78,7 @@ function updateValueRealTime() {
         alavancagem,
         spread,
         custoOperacao: spread * 5,
-        lucro: (volume * initialValue * alavancagem).toFixed(2),
+        saldoNecessario: (volume * initialValue * alavancagem).toFixed(2),
       });
     });
 }
@@ -112,28 +98,8 @@ function toggleRequests() {
 document.getElementById('real-time-check').addEventListener("change", toggleRequests);
 // -----------------------------------------------------
 
-
-const MAX_LIST_ITEMS = 7;
-
-function addListItem(item) {
-  colorizeMinMax();
-  const list = document.getElementById("horizontal-list");
-
-  if (list.children.length >= MAX_LIST_ITEMS) {
-    list.removeChild(list.lastElementChild);
-  }
-
-  const listItem = document.createElement("li");
-  listItem.className = "list-group-item";
-  listItem.textContent = `${new Date().toLocaleString()} | Volume:${item.volume} | Preco:${item.initialValue} | Alavancagem:${item.alavancagem} | Spread:${item.spread} | CustoOperacao:${item.custoOperacao} | ${item.lucro}`;
-
-  list.insertBefore(listItem, list.firstChild);
-  console.log("added item", item, "to list", list);
-  colorizeMinMax();
-}
-
 function colorizeMinMax() {
-  var rows = document.getElementById("values-table").getElementsByTagName("tr");
+  var rows = valuesTable.getElementsByTagName("tr");
 
   var values = [];
   for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row

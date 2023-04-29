@@ -12,12 +12,63 @@ function addToTable() {
 
   var newRow = table.insertRow(-1);
 
-  newRow.insertCell(0).innerHTML = volume;
-  newRow.insertCell(1).innerHTML = initialValue;
-  newRow.insertCell(2).innerHTML = alavancagem;
-  newRow.insertCell(3).innerHTML = profit.toFixed(2);
+  newRow.insertCell(0).innerHTML = new Date().toLocaleString();
+  newRow.insertCell(1).innerHTML = volume;
+  newRow.insertCell(2).innerHTML = initialValue;
+  newRow.insertCell(3).innerHTML = alavancagem;
+//  newRow.insertCell(4).innerHTML = profit.toFixed(2);
+//  newRow.insertCell(5).innerHTML = profit.toFixed(2) * 5;
+//  newRow.insertCell(5).innerHTML = profit.toFixed(2) * alavancagem * volume;
 
 }
+
+function addDataToTable(data) {
+  colorizeMinMax();
+  const table = document.getElementById("values-table");
+
+  // Insert a new row at the end of the table
+  const newRow = table.insertRow(-1);
+
+  // Insert cells into the new row
+  const dateCell = newRow.insertCell(0);
+  const volumeCell = newRow.insertCell(1);
+  const priceCell = newRow.insertCell(2);
+  const leverageCell = newRow.insertCell(3);
+  const spreadCell = newRow.insertCell(4);
+  const costCell = newRow.insertCell(5);
+  const profitCell = newRow.insertCell(6);
+
+  // Fill the cells with data
+  dateCell.textContent = new Date().toLocaleString();
+  volumeCell.textContent = data.volume;
+  priceCell.textContent = data.initialValue;
+  leverageCell.textContent = data.alavancagem;
+  spreadCell.textContent = data.spread;
+  costCell.textContent = data.custoOperacao;
+  profitCell.textContent = data.lucro;
+
+  // Remove the first row if the table has more than 10 rows
+  if (table.rows.length > 10) {
+    table.deleteRow(1);
+  }
+  colorizeMinMax();
+}
+
+
+function addListItem(item) {
+  colorizeMinMax();
+  const table = document.getElementById("data-table");
+
+  if (table.rows.length >= MAX_LIST_ITEMS) {
+    table.deleteRow(-1);
+  }
+
+  addTableRow(table, item);
+
+  console.log("added item", item, "to table", table);
+  colorizeMinMax();
+}
+
 
 function updateValueRealTime() {
   const volumeEl = document.getElementById("volume");
@@ -35,7 +86,7 @@ function updateValueRealTime() {
       const alavancagem = Number(alavancagemEl.value);
       const spread = Number(data.spread);
 
-      addListItem({
+    addDataToTable({
         volume,
         initialValue,
         alavancagem,
@@ -82,27 +133,27 @@ function addListItem(item) {
 }
 
 function colorizeMinMax() {
-  var items = document.getElementById("horizontal-list").getElementsByTagName("li");
+  var rows = document.getElementById("values-table").getElementsByTagName("tr");
 
   var values = [];
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i].innerText;
-    var value = parseFloat(item.split("|")[item.split("|").length - 1].trim());
+  for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+    var row = rows[i];
+    var value = parseFloat(row.cells[row.cells.length - 1].innerText.trim());
     values.push(value);
   }
 
   var max = Math.max.apply(Math, values);
   var min = Math.min.apply(Math, values);
 
-  for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    var value = parseFloat(item.innerText.split("|")[item.innerText.split("|").length - 1].trim());
+  for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+    var row = rows[i];
+    var value = parseFloat(row.cells[row.cells.length - 1].innerText.trim());
     if (value >= max - 0.0001) {
-      item.style.backgroundColor = "lightgreen";
+      row.style.backgroundColor = "lightgreen";
     } else if (value <= min + 0.0001) {
-      item.style.backgroundColor = "lightcoral";
+      row.style.backgroundColor = "lightcoral";
     } else {
-      item.style.backgroundColor = "";
+      row.style.backgroundColor = "";
     }
   }
 }
